@@ -104,7 +104,6 @@ functions:
     package:
       patterns:
         - config/**
-        - node_modules/uuid/**
         - api/player/update.js
       individually: true
     description: 'this api is use to update skill of player on a game with require filed (skill)'
@@ -123,7 +122,6 @@ functions:
     package:
       patterns:
         - config/**
-        - node_modules/uuid/**
         - api/player/get.js
       individually: true
     description: 'this api is use to list all game of a player with their skill with require parameter player id'
