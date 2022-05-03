@@ -12,10 +12,6 @@
   },
   "author": "Chandarith Chea",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/BanhJi/serverless-starter/issues"
-  },
-  "homepage": "https://github.com/BanhJi/serverless-starter#readme",
   "dependencies": {
     "aws-sdk": "^2.610.0",
     "axios": "^0.21.4",
