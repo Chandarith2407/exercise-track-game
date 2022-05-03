@@ -43,10 +43,10 @@ module.exports.register = async (event) => {
     PutRequest: {
       Item: {
         pk: head,
-        sk: data.gId,
+        sk: data.gId, // Game ID
         pName: data.name,
-        gName: data.gName,
-        status: data.gStatus,
+        gName: data.gName, // Game Name
+        status: data.gStatus, // Game Status
         deleted: data.deleted || 0,
         createdAt: createdAt,
         updatedAt: timestamp

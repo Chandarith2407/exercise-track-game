@@ -38,6 +38,15 @@ resources: # create table here
             KeyType: HASH
           - AttributeName: sk
             KeyType: RANGE
+        GlobalSecondaryIndexes:
+          - IndexName: GSI1
+            KeySchema:
+              - AttributeName: sk
+                KeyType: HASH
+              - AttributeName: pk
+                KeyType: RANGE
+            Projection:
+              ProjectionType: 'ALL'
         BillingMode: PAY_PER_REQUEST
 custom:
   stage: ${opt:stage, self:provider.stage}
@@ -56,19 +65,20 @@ functions:
         - node_modules/uuid/**
         - api/games/add.js
       individually: true
+    description: 'this api is use to create a game with require filed (name, description, developer, owner, platforms, initRelease)'
     events:
       - http:
           path: game/add
           method: POST
           cors: true
   game-getAll:
-    handler: api/games/get.listAll
+    handler: api/games/get.listGames
     package:
       patterns:
         - config/**
-        - node_modules/uuid/**
         - api/games/get.js
       individually: true
+    description: 'this api is use to list all games with return back (name, description, developer, owner, platforms, initRelease)'
     events:
       - http:
           path: game/list
@@ -83,6 +93,7 @@ functions:
         - node_modules/uuid/**
         - api/player/add.js
       individually: true
+    description: 'this api is use to create player for a game with require filed (name, gender, age, nickname, email, nationality, profile, game id, game name and game status)'
     events:
       - http:
           path: player/add
@@ -96,6 +107,7 @@ functions:
         - node_modules/uuid/**
         - api/player/update.js
       individually: true
+    description: 'this api is use to update skill of player on a game with require filed (skill)'
     events:
       - http:
           path: player/{playerId}/game/{gameId}/update
@@ -114,6 +126,7 @@ functions:
         - node_modules/uuid/**
         - api/player/get.js
       individually: true
+    description: 'this api is use to list all game of a player with their skill with require parameter player id'
     events:
       - http:
           path: player/{playerId}/list
