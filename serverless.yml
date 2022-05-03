@@ -1,0 +1,125 @@
+service: track-games
+
+provider:
+  name: aws
+  endpointType: REGIONAL
+  runtime: nodejs12.x
+  apiGateway:
+    shouldStartNameWithService: true
+  stage: dev
+  releasedVersion: v1
+  stackName: ${self:service}-${self:custom.stage}
+  region: ap-northeast-1 # this is the region that we deploy our lambda to
+  environment:
+    item_table: Game-${self:custom.stage}
+  iamRoleStatements:
+    - Effect: "Allow" # or Deny
+      Resource: "*"
+      Action: # this is the action against dynamodb
+        - "dynamodb:Query"
+        - "dynamodb:GetItem"
+        - "dynamodb:PutItem"
+        - "dynamodb:UpdateItem"
+        - "dynamodb:DeleteItem"
+        - "dynamodb:BatchWriteItem"
+resources: # create table here
+  Resources:
+    Game:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: Game-${self:custom.stage}
+        AttributeDefinitions:
+          - AttributeName: pk
+            AttributeType: S
+          - AttributeName: sk
+            AttributeType: S
+        KeySchema:
+          - AttributeName: pk
+            KeyType: HASH
+          - AttributeName: sk
+            KeyType: RANGE
+        BillingMode: PAY_PER_REQUEST
+custom:
+  stage: ${opt:stage, self:provider.stage}
+package:
+  individually: true
+  patterns:
+    - "!**/*"
+
+functions:
+  #Game
+  game-create:
+    handler: api/games/add.create
+    package:
+      patterns:
+        - config/**
+        - node_modules/uuid/**
+        - api/games/add.js
+      individually: true
+    events:
+      - http:
+          path: game/add
+          method: POST
+          cors: true
+  game-getAll:
+    handler: api/games/get.listAll
+    package:
+      patterns:
+        - config/**
+        - node_modules/uuid/**
+        - api/games/get.js
+      individually: true
+    events:
+      - http:
+          path: game/list
+          method: GET
+          cors: true
+  #PLAYER
+  player-create:
+    handler: api/player/add.register
+    package:
+      patterns:
+        - config/**
+        - node_modules/uuid/**
+        - api/player/add.js
+      individually: true
+    events:
+      - http:
+          path: player/add
+          method: POST
+          cors: true
+  skill-update:
+    handler: api/player/update.skill
+    package:
+      patterns:
+        - config/**
+        - node_modules/uuid/**
+        - api/player/update.js
+      individually: true
+    events:
+      - http:
+          path: player/{playerId}/game/{gameId}/update
+          method: PUT
+          cors: true
+          request:
+            parameters:
+              paths:
+                playerId: true
+                gameId: true
+  player-game-getAll:
+    handler: api/player/get.listPlayer
+    package:
+      patterns:
+        - config/**
+        - node_modules/uuid/**
+        - api/player/get.js
+      individually: true
+    events:
+      - http:
+          path: player/{playerId}/list
+          method: GET
+          cors: true
+          request:
+            parameters:
+              paths:
+                playerId: true
